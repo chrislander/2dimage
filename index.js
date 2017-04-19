@@ -7,25 +7,17 @@ var  express  = require('express')
      baseDir  = 'saved'
      
 var download = function(uri, filename, callback){
-  request.head(uri, function(err, res, body){
-    console.log('content-type:', res.headers['content-type']);
-    console.log('content-length:', res.headers['content-length']);
+    request.head(uri, function(err, res, body){
+      console.log('content-type:', res.headers['content-type']);
+      console.log('content-length:', res.headers['content-length']);
 
-    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-  });
+      request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
 };
-
-
-//download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
-//     console.log('done');
-// }); 
-
-
 
 app.get('/', function (req, res) {
     
 })
-
 
 app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
     
@@ -35,8 +27,7 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
     
     var frames = [0,1,2,3,4,5,6,7,"home"];
     var colors = ["FFFFFF","000000","AAAAEE"];
-    
-    
+   
     var urls = [];
     var urlbase = "http://tuning-solera.herokuapp.com/";
     
@@ -47,7 +38,7 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
             urls.push(url);   
             
             mkdirp(saveDir, function(err) { 
-                // path exists unless there was an error
+                console.log('error creating directory')
             });
             
             
@@ -57,13 +48,9 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
         }        
     }
     
-
-   //res.sendFile(path.join(__dirname + '/index.html')); 
    res.send(urls);
 
-    
-    
-    
+
 })
 
 app.listen(3000)
