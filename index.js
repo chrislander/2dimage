@@ -69,10 +69,22 @@ app.get('/csvtojson/:filename', function (req, res){
         
         //Get the audaID
         var audaID = obj.audaID.substring(0,4);        
-                
+
+        // Get the colors
+        var colors = obj.colors.split("|");
+            colorlist = [];
+
+        for ( var n = 0; n < colors.length; n+= 3 ){
+             colorlist.push({
+                 name: colors[n+3],
+                 hex: colors[n+1]
+             });
+        }        
+        
         //If we haven't processed this ID yet        
         if (!usedAudaIDs.includes(audaID)){
             
+            /*
             // Get the colors
             var colors = obj.colors.split("|");
                 colorlist = [];
@@ -82,16 +94,20 @@ app.get('/csvtojson/:filename', function (req, res){
                      name: colors[n+3],
                      hex: colors[n+1]
                  });
-            }            
+            }*/            
             
-            // Get the doors & bodystyle
+            // Get the doors & bodystyle find the position of the string "DR "; Note the space
+            var desc = obj.description,            
+                doorPos = desc.indexOf("DR "),
+                doors   = desc.substring(doorPos -1 ,doorPos),
+                style   = desc.substring(doorPos +3 ,doorPos + 4);
             
             
             // Create new object to hold the information.
             var objToAdd = {
                 audaID : audaID,
-                doors: 4,
-                style : 'S',
+                doors: doors,
+                style : style,
                 colors : JSON.stringify(colorlist)
             }            
             
@@ -108,8 +124,12 @@ app.get('/csvtojson/:filename', function (req, res){
             
           // If the ID has been used we need to add in the unique colors  
             for ( var n = 0; n < output.length; n++ ){
-                 if (output[n].audaID == audaID){
+                 if (output[n].audaID === audaID){
                      console.log("yeah found duplicate to add colors to");
+                     var colorArr = output[n].colors;
+                     colorArr.push({
+                         name: 
+                     })
                  }
                  //console.log(n);
             }    
@@ -121,11 +141,7 @@ app.get('/csvtojson/:filename', function (req, res){
         
     })
     .on('done',(error)=>{
-        //console.log(output);
-        //console.log(usedAudaIDs);
-        //console.log(i)
-        //console.log(output[1])
-        console.log(totalDupesProcessed);
+        console.log(output);
         console.log("Original: " + i + " Duplicates: " + totalDupesProcessed + " Total overall: " + (i+totalDupesProcessed))
  
     })
