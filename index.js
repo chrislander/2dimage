@@ -56,9 +56,27 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
 
 app.get('/readcsv/:filename', function (req, res){
     
-    var filename      = req.params.filename;
-    res.send(filename);
+    var filename      = req.params.filename + '.csv';
     
+    if (fs.existsSync(filename)){
+        
+        var csv = require("fast-csv");
+
+        csv
+         .fromPath(filename)
+         .on("data", function(data){
+             console.log(data);
+         })
+         .on("end", function(){
+             console.log("done");
+         });  
+        res.send(filename + ' processed');
+    } else {
+        res.send(filename + ' does not exist yet');
+    }
+    
+  
+   
 })
 
 app.listen(3000)

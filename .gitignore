@@ -1,3 +1,4 @@
 nbproject/*
 saved/*
 node_modules/*
+*.csv
