@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
+    "fast-csv": "^2.4.0",
     "mkdirp": "^0.5.1",
     "nodemon": "^1.11.0",
     "request": "^2.81.0"

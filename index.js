@@ -4,7 +4,8 @@ var  express  = require('express');
      fs       = require('fs');
      request  = require('request');     
      mkdirp   = require('mkdirp');
-     baseDir  = 'saved';
+     
+    baseDir  = 'saved';
      
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
@@ -51,6 +52,13 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
    res.send(urls);
 
 
+})
+
+app.get('/readcsv/:filename', function (req, res){
+    
+    var filename      = req.params.filename;
+    res.send(filename);
+    
 })
 
 app.listen(3000)
