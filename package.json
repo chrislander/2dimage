@@ -9,6 +9,7 @@
   "author": "Chris Lander",
   "license": "ISC",
   "dependencies": {
+    "csvtojson": "^1.1.4",
     "express": "^4.15.2",
     "fast-csv": "^2.4.0",
     "mkdirp": "^0.5.1",
