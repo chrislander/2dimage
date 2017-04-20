@@ -1,14 +1,26 @@
 {
-  "name": "myapp",
+  "name": "vehicle_image_downloader",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Chris Lander",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.15.2"
-  }
+    "express": "^4.15.2",
+    "mkdirp": "^0.5.1",
+    "nodemon": "^1.11.0",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrislander/2dimage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chrislander/2dimage/issues"
+  },
+  "homepage": "https://github.com/chrislander/2dimage#readme"
 }

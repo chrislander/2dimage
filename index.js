@@ -1,10 +1,10 @@
-var  express  = require('express')
-     app      = express()
-     path     = require('path')
-     fs       = require('fs')
-     request  = require('request')     
-     mkdirp   = require('mkdirp')
-     baseDir  = 'saved'
+var  express  = require('express');
+     app      = express();
+     path     = require('path');
+     fs       = require('fs');
+     request  = require('request');     
+     mkdirp   = require('mkdirp');
+     baseDir  = 'saved';
      
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
@@ -16,7 +16,7 @@ var download = function(uri, filename, callback){
 };
 
 app.get('/', function (req, res) {
-    
+    res.send('<h1>Solera</h1>')
 })
 
 app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
