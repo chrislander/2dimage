@@ -61,54 +61,54 @@ app.get('/csvtojson/:filename', function (req, res){
     var output = [],
         usedAudaIDs = [],
         i = 0;
-        totalDupesProcessed = 0;
+        totalDupesProcessed = 0,
+        checkedcounter =0,
+        addedcounter = 0;
     
     csv()
     .fromFile(filename)
     .on('json',(obj)=>{
         
         //Get the audaID
-        var audaID = obj.audaID.substring(0,4);        
-
-        // Get the colors
+        var audaID = obj.audaID.substring(0,4);
         var colors = obj.colors.split("|");
-            colorlist = [];
-
-        for ( var n = 0; n < colors.length; n+= 3 ){
-             colorlist.push({
-                 name: colors[n+3],
-                 hex: colors[n+1]
-             });
-        }        
         
         //If we haven't processed this ID yet        
         if (!usedAudaIDs.includes(audaID)){
-            
-            /*
-            // Get the colors
-            var colors = obj.colors.split("|");
-                colorlist = [];
-                
-            for ( var n = 0; n < colors.length; n+= 3 ){
-                 colorlist.push({
-                     name: colors[n+3],
-                     hex: colors[n+1]
-                 });
-            }*/            
-            
+                               
             // Get the doors & bodystyle find the position of the string "DR "; Note the space
             var desc = obj.description,            
                 doorPos = desc.indexOf("DR "),
                 doors   = desc.substring(doorPos -1 ,doorPos),
                 style   = desc.substring(doorPos +3 ,doorPos + 4);
             
+            // Get the colors
+            
+            var colorlist = [];            
+
+            for ( var n = 0; n < colors.length; n+= 3 ){
+                 
+                 /*
+                 colorlist.push({
+                     name: colors[n+3],
+                     hex: colors[n+1]
+                 });
+                 */
+                var hex = colors[n+1],
+                    name = colors[n+3]
+                
+                if (!colorlist.includes(hex + '_' + name) && hex != null){
+                    colorlist.push(hex + '_' + name);
+                }
+                
+            }                   
             
             // Create new object to hold the information.
             var objToAdd = {
                 audaID : audaID,
                 doors: doors,
                 style : style,
-                colors : JSON.stringify(colorlist)
+                colors : colorlist
             }            
             
             //Push the object to our json output array
@@ -122,27 +122,37 @@ app.get('/csvtojson/:filename', function (req, res){
             
         } else {
             
-          // If the ID has been used we need to add in the unique colors  
+          // If the ID has been used we need to find the key of the audaID in the array 
             for ( var n = 0; n < output.length; n++ ){
                  if (output[n].audaID === audaID){
                      console.log("yeah found duplicate to add colors to");
-                     var colorArr = output[n].colors;
-                     colorArr.push({
-                         name: 
-                     })
+                            
+                    for ( var j = 0; j < colors.length; j+= 3 ){
+
+                        var hex = colors[j+1],
+                            name = colors[j+3]
+                        checkedcounter++;
+                        if (!output[n].colors.includes(hex + '_' + name) && hex != null){
+                            output[n].colors.push(hex + '_' + name);
+                            addedcounter++;
+                        }
+                    }
+            
                  }
                  //console.log(n);
             }    
             totalDupesProcessed++;
             
         }
-     
+        
 
         
     })
     .on('done',(error)=>{
-        console.log(output);
+        
+        console.log(JSON.stringify(output));
         console.log("Original: " + i + " Duplicates: " + totalDupesProcessed + " Total overall: " + (i+totalDupesProcessed))
+        console.log(addedcounter + ' out of ' + checkedcounter );
  
     })
     
