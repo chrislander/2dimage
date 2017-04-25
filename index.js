@@ -1,23 +1,74 @@
-var  express  = require('express');
-     app      = express();
-     path     = require('path');
-     fs       = require('fs');
-     request  = require('request');     
-     mkdirp   = require('mkdirp');
+var     express  = require('express'),
+        app      = express(),
+        path     = require('path'),
+        fs       = require('fs'),
+        request  = require('request'),     
+        mkdirp   = require('mkdirp'),     
+        baseDir  = 'saved';
      
-    baseDir  = 'saved';
-     
+//Define a function for downloading the image
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
-      console.log('content-type:', res.headers['content-type']);
-      console.log('content-length:', res.headers['content-length']);
-
-      request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+        
+        
+        console.log('content-type:', res.headers['content-type']);
+        console.log('content-length:', res.headers['content-length']);
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+        
+        
     });
 };
 
+var createUrls = function (obj){
+    var dlcounter = 0;
+    var urlbase = "http://tuning-solera.herokuapp.com/",
+        frames = [0,1,2,3,4,5,6,7,"home"];
+
+    for (var key in obj){
+         
+        var model = obj[key];        
+            model.urls = []; 
+              
+        var saveDir = baseDir + '/' + model.audaID + '_' + model.doors + model.style;
+        
+        mkdirp(saveDir, function(err) { 
+            if (err) console.error(err);            
+        });
+        
+        for ( var i = 0; i < model.colors.length; i++ ){
+            
+            for ( var j = 0; j < frames.length; j++ ){   
+                var getcolor = model.colors[i].split("_"),
+                    color = getcolor[0], 
+                    url = urlbase + model.audaID + '/' + model.doors + '/' + model.style + '/' + color + "/" + frames[j];
+                                    
+                model.urls.push(url);
+                dlcounter++
+
+                
+                //download('https://www.google.com/images/srpr/logo3w.png', saveDir + '/google_' + model.colors[i] + '_' + frames[j] + '.png', function(){
+                //     
+                // });
+                
+                
+            }     
+           
+        }
+        //console.log(model);
+        if (key > 5){
+            //console.log(model.audaID);
+            //break;
+        }
+        console.log(model.urls);
+        console.log(dlcounter);
+   
+    }  
+    
+    
+}
+
 app.get('/', function (req, res) {
-    res.send('<h1>Solera</h1>')
+    res.send("Home");
 })
 
 app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
@@ -37,10 +88,9 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
             urls.push(url);   
             
             mkdirp(saveDir, function(err) { 
-                console.log('error creating directory')
+                console.log('error creating directory');
             });
-            
-            
+                        
             download('https://www.google.com/images/srpr/logo3w.png', saveDir + '/google_' + colors[i] + frames[j] + '.png', function(){
                  console.log('done');
              });             
@@ -49,20 +99,21 @@ app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
     
    res.send(urls);
 
-
 })
 
 
 app.get('/csvtojson/:filename', function (req, res){
+    //calling a file called 2d.csv from the url http://localhost:3000/csvtojson/2d
+    //look at the file in the root of the project directory
     
     const filename      = req.params.filename + '.csv';        
-    const csv = require('csvtojson')
+    const csv = require('csvtojson');
     
     var output = [],
         usedAudaIDs = [],
-        i = 0;
+        i = 0,
         totalDupesProcessed = 0,
-        checkedcounter =0,
+        checkedcounter = 0,
         addedcounter = 0;
     
     csv()
@@ -88,19 +139,16 @@ app.get('/csvtojson/:filename', function (req, res){
 
             for ( var n = 0; n < colors.length; n+= 3 ){
                  
-                 /*
-                 colorlist.push({
-                     name: colors[n+3],
-                     hex: colors[n+1]
-                 });
-                 */
                 var hex = colors[n+1],
-                    name = colors[n+3]
-                
-                if (!colorlist.includes(hex + '_' + name) && hex != null){
-                    colorlist.push(hex + '_' + name);
+                    name = colors[n+3];
+
+
+                if (!colorlist.includes(hex + '_' + name)){
+                    if (hex != null){
+                        colorlist.push(hex + '_' + name);
+                    }
                 }
-                
+
             }                   
             
             // Create new object to hold the information.
@@ -109,7 +157,7 @@ app.get('/csvtojson/:filename', function (req, res){
                 doors: doors,
                 style : style,
                 colors : colorlist
-            }            
+            };            
             
             //Push the object to our json output array
             output.push(objToAdd);  
@@ -130,34 +178,33 @@ app.get('/csvtojson/:filename', function (req, res){
                     for ( var j = 0; j < colors.length; j+= 3 ){
 
                         var hex = colors[j+1],
-                            name = colors[j+3]
+                            name = colors[j+3];
+                        
                         checkedcounter++;
-                        if (!output[n].colors.includes(hex + '_' + name) && hex != null){
-                            output[n].colors.push(hex + '_' + name);
-                            addedcounter++;
+                        if (!output[n].colors.includes(hex + '_' + name)) {
+                            if (hex != null){
+                                output[n].colors.push(hex + '_' + name);
+                                addedcounter++;
+                            }
                         }
                     }
             
                  }
-                 //console.log(n);
             }    
-            totalDupesProcessed++;
-            
-        }
-        
-
-        
+            totalDupesProcessed++;            
+        }                
     })
-    .on('done',(error)=>{
+    .on('done',(error)=>{                
         
-        console.log(JSON.stringify(output));
-        console.log("Original: " + i + " Duplicates: " + totalDupesProcessed + " Total overall: " + (i+totalDupesProcessed))
+        console.log("Original: " + i + " Duplicates: " + totalDupesProcessed + " Total overall: " + (i+totalDupesProcessed));
         console.log(addedcounter + ' out of ' + checkedcounter );
- 
+        //console.log(JSON.stringify(output));
+        createUrls(output);
+        res.send("Made it to the end");
     })
-    
-  
-   
+
 })
 
-app.listen(3000)
+
+
+app.listen(3001);
