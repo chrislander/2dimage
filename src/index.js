@@ -16,7 +16,7 @@ app.get('/urls/:filename', function (req, res){
     var filename    = 'data/' + req.params.filename + '.json';     
     var output      = require('./models/generate_urls.js');    
     output.generate_urls(filename);        
->>>>>>> feature_x
+
 })
 
 app.get('/download/:filename', function (req, res){
