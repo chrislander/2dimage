@@ -12,6 +12,7 @@
     "csvtojson": "^1.1.4",
     "express": "^4.15.2",
     "fast-csv": "^2.4.0",
+    "json-beautify": "^1.0.1",
     "mkdirp": "^0.5.1",
     "nodemon": "^1.11.0",
     "request": "^2.81.0"
