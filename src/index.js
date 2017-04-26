@@ -5,17 +5,15 @@ var     express  = require('express'),
         request  = require('request'),     
         mkdirp   = require('mkdirp'),     
         baseDir  = 'saved';
+
+        
      
 //Define a function for downloading the image
 var download = function(uri, filename, callback){
-    request.head(uri, function(err, res, body){
-        
-        
+    request.head(uri, function(err, res, body){               
         console.log('content-type:', res.headers['content-type']);
         console.log('content-length:', res.headers['content-length']);
-        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-        
-        
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);               
     });
 };
 
@@ -23,7 +21,8 @@ var createUrls = function (obj){
     var dlcounter = 0;
     var urlbase = "http://tuning-solera.herokuapp.com/",
         frames = [0,1,2,3,4,5,6,7,"home"];
-
+        //We need just to off these frames
+        
     for (var key in obj){
          
         var model = obj[key];        
@@ -44,20 +43,11 @@ var createUrls = function (obj){
                                     
                 model.urls.push(url);
                 dlcounter++
-
                 
                 //download('https://www.google.com/images/srpr/logo3w.png', saveDir + '/google_' + model.colors[i] + '_' + frames[j] + '.png', function(){
                 //     
-                // });
-                
-                
-            }     
-           
-        }
-        //console.log(model);
-        if (key > 5){
-            //console.log(model.audaID);
-            //break;
+                // });                                
+            }                
         }
         console.log(model.urls);
         console.log(dlcounter);
@@ -71,42 +61,13 @@ app.get('/', function (req, res) {
     res.send("Home");
 })
 
-app.get('/generate/:audaID/:doors/:bodystyle/', function (req, res){
-    
-    var audaID      = req.params.audaID,
-        doors       = req.params.doors,
-        bodystyle   = req.params.bodystyle,
-        frames = [0,1,2,3,4,5,6,7,"home"],
-        colors = ["FFFFFF","000000","AAAAEE"],
-        urls = [],
-        urlbase = "http://tuning-solera.herokuapp.com/";
-    
-    for ( var i = 0; i < colors.length; i++ ){
-        for ( var j = 0; j < frames.length; j++ ){            
-            var url = urlbase + audaID + '/' + doors + '/' + bodystyle + '/' + colors[i] + "/" + frames[j],
-                saveDir = baseDir + '/' + audaID + '_' + doors + bodystyle;
-            urls.push(url);   
-            
-            mkdirp(saveDir, function(err) { 
-                console.log('error creating directory');
-            });
-                        
-            download('https://www.google.com/images/srpr/logo3w.png', saveDir + '/google_' + colors[i] + frames[j] + '.png', function(){
-                 console.log('done');
-             });             
-        }        
-    }
-    
-   res.send(urls);
-
-})
-
 
 app.get('/csvtojson/:filename', function (req, res){
     //calling a file called 2d.csv from the url http://localhost:3000/csvtojson/2d
     //look at the file in the root of the project directory
     
-    const filename      = req.params.filename + '.csv';        
+    const filename      = 'data/' + req.params.filename + '.csv';   
+    console.log(filename);
     const csv = require('csvtojson');
     
     var output = [],
@@ -142,13 +103,11 @@ app.get('/csvtojson/:filename', function (req, res){
                 var hex = colors[n+1],
                     name = colors[n+3];
 
-
                 if (!colorlist.includes(hex + '_' + name)){
                     if (hex != null){
                         colorlist.push(hex + '_' + name);
                     }
                 }
-
             }                   
             
             // Create new object to hold the information.
@@ -197,8 +156,7 @@ app.get('/csvtojson/:filename', function (req, res){
     .on('done',(error)=>{                
         
         console.log("Original: " + i + " Duplicates: " + totalDupesProcessed + " Total overall: " + (i+totalDupesProcessed));
-        console.log(addedcounter + ' out of ' + checkedcounter );
-        //console.log(JSON.stringify(output));
+        console.log(addedcounter + ' out of ' + checkedcounter );        
         createUrls(output);
         res.send("Made it to the end");
     })
