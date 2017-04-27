@@ -17,7 +17,7 @@ exports.download_all = function (filename) {
     for (var key in models){
         var model = models[key],
             dir = 'saved/'+model.audaID+'_'+model.doors+model.style,
-            filename = /google_' + model.colors[i] + '_' + frames[j] + '.png'
+            filename = '/google_' + model.colors[i] + '_' + frames[j] + '.png';
             return console.log(dir);
         for (var i in obj.urls){
             
