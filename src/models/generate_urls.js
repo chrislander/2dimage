@@ -1,15 +1,16 @@
-var fs          = require('fs');
+var fs          = require('fs'),
     beautify    = require("json-beautify");
 
 exports.generate_urls = function (filename){
     
     var obj         = JSON.parse(fs.readFileSync(filename, 'utf8'));    
         urlbase     = "http://tuning-solera.herokuapp.com/",
-        frames      = [0,1,2,3,4,5,6,7,"home"];
+        //frames      = [0,1,2,3,4,5,6,7,"home"];
+        frames      = [0,1];
         
     for (var key in obj){
 
-        var model = obj[key];        
+        var model       = obj[key];        
             model.urls = []; 
                       
         for ( var i = 0; i < model.colors.length; i++ ){
@@ -17,9 +18,13 @@ exports.generate_urls = function (filename){
             for ( var j = 0; j < frames.length; j++ ){   
                 var getcolor = model.colors[i].split("_"),
                     color = getcolor[0], 
-                    url = urlbase + model.audaID + '/' + model.doors + '/' + model.style + '/' + color + "/" + frames[j];
+                    url = urlbase + model.audaID + '/' + model.doors + '/' + model.style + '/' + color + "/" + frames[j] + "/solid_glossy",
+                    imgfilename = model.audaID + "_" + model.colors[i] + '_' + frames[j] + '.png';
                                     
-                model.urls.push(url);                
+                model.urls.push({
+                    url : url,
+                    imgfilename : imgfilename
+                });                
             }                
         }                   
     }  

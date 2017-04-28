@@ -8,7 +8,7 @@ app.get('/', function (req, res) {
 
 app.get('/parse/:filename', function (req, res){        
     var filename    = 'data/' + req.params.filename + '.csv';     
-    var output      = require('./models/parse.js');    
+    var output      = require('./models/parse.js');       
     output.process(filename); 
 })
 
@@ -19,11 +19,15 @@ app.get('/urls/:filename', function (req, res){
 
 })
 
-app.get('/download/:filename', function (req, res){
-    var filename    = 'data/' + req.params.filename + '.json';     
-    var download      = require('./models/download.js');    
-    download.download_all(filename);
-    //download.download_single();
+app.get('/download/:type/:filename', function (req, res){
+    var type = req.params.type,
+        filename    = 'data/' + req.params.filename + '.json',    
+        download      = require('./models/download.js');    
+    
+    if (type === 'all'){
+        download.download_all(filename);
+    }
+        
 })
 
 app.listen(3000);
