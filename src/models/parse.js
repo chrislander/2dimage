@@ -4,7 +4,7 @@ var beautify    = require("json-beautify");
 
 const data_dir = 'data/' 
 
-var standard_palette = JSON.parse(fs.readFileSync(data_dir + '/colors/standard.json', 'utf8'));
+var standard_palette = JSON.parse(fs.readFileSync('colors/standard.json', 'utf8'));
 
 console.log(standard_palette);
 
