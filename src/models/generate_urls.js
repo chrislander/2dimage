@@ -29,7 +29,7 @@ exports.generate_urls = function (filename){
         }                   
     }  
     
-    fs.writeFile("data/urls.json", beautify(obj, null, 2, 100), function(err) {
+    fs.writeFile(data_dir + "urls.json", beautify(obj, null, 2, 100), function(err) {
         if(err) return console.log(err);
     }); 
 }

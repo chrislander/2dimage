@@ -1,19 +1,22 @@
 
 var express  = require('express'),
     app      = express();
+    
+    
+const data_dir = 'data/'    
                        
 app.get('/', function (req, res) {
     res.send("Home");
 })
 
 app.get('/parse/:filename', function (req, res){        
-    var filename    = 'data/' + req.params.filename + '.csv';     
+    var filename    = data_dir + req.params.filename + '.csv';     
     var output      = require('./models/parse.js');       
     output.process(filename); 
 })
 
 app.get('/urls/:filename', function (req, res){
-    var filename    = 'data/' + req.params.filename + '.json';     
+    var filename    = data_dir + req.params.filename + '.json';     
     var output      = require('./models/generate_urls.js');    
     output.generate_urls(filename);        
 
@@ -21,7 +24,7 @@ app.get('/urls/:filename', function (req, res){
 
 app.get('/download/:type/:filename', function (req, res){
     var type = req.params.type,
-        filename    = 'data/' + req.params.filename + '.json',    
+        filename    = data_dir + req.params.filename + '.json',    
         download      = require('./models/download.js');    
     
     if (type === 'all'){

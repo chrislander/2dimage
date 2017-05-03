@@ -5,7 +5,7 @@ var path    = require('path'),
 
 exports.read_file = function (filename){
     return JSON.parse(fs.readFileSync(filename, 'utf8'));     
-}
+};
 
 exports.download_all = function (filename) {    
     
@@ -21,24 +21,24 @@ exports.download_all = function (filename) {
             this.download(model.urls[i].url, dir +'/'+ model.urls[i].imgfilename, function(){     
                 console.log('downloaded ' + model.urls[i].imgfilename);
             });  
-            return
+            return;
            
         }
         return console.log('processed a model');
     }
  
-}
+};
 
 exports.download_single = function (obj, audaID) {
     return console.log('in download single');
-}
+};
 
 exports.makedir = function (dir){    
     mkdirp(dir, function (err) {
         if (err)
             console.error(err);
     });    
-}
+};
 
 exports.download = function (uri, filename, callback) {        
     
