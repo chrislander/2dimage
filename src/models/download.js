@@ -15,11 +15,11 @@ exports.download_all = function (filename) {
         var model = models[key],
             dir = 'saved/'+model.audaID+'_'+model.doors+model.style;  
             this.makedir(dir);
-            console.log('here');
+            
         for (var i in model.urls){             
-            console.log(model.urls[i].url);            
+            
             this.download(model.urls[i].url, dir +'/'+ model.urls[i].imgfilename, function(){     
-                console.log('downloaded ' + model.urls[i].imgfilename);
+            
             });  
             return;
            

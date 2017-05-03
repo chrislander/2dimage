@@ -2,11 +2,10 @@ var csv         = require('csvtojson');
 var fs          = require('fs');
 var beautify    = require("json-beautify");
 
-const data_dir = 'data/' 
+const data_dir = 'data/'; 
 
 var standard_palette = JSON.parse(fs.readFileSync('colors/standard.json', 'utf8'));
 
-console.log(standard_palette);
 
 exports.process = function(filename){
                 
@@ -26,12 +25,13 @@ exports.process = function(filename){
        
                 if (!usedAudaIDs.includes(audaID)) {
 
-                    var desc    = obj.description,
-                        doorPos = desc.indexOf("DR "),
-                        doors   = desc.substring(doorPos - 1, doorPos),
-                        style   = desc.substring(doorPos + 3, doorPos + 4),
-                        colorlist = [],
-                        vins      = [];
+                    var desc            = obj.description,
+                        doorPos         = desc.indexOf("DR "),
+                        doors           = desc.substring(doorPos - 1, doorPos),
+                        style           = desc.substring(doorPos + 3, doorPos + 4),
+                        usedColorList   = [],                        
+                        vins            = [],
+                        oem_palette     = [];
                     
                     vins.push(vin);
 
@@ -39,10 +39,17 @@ exports.process = function(filename){
                         
                         var hex  = colors[n + 1],
                             name = colors[n + 3];
+                        
+                        if (hex != null) { 
+                            hex = hex.toUpperCase();
                             
-                        if (!colorlist.includes(hex + '_' + name)) {
-                            if (hex != null) {
-                                colorlist.push(hex + '_' + name);
+                            if (!usedColorList.includes(hex + '_' + name)) {                                                            
+                                var oem_color = {
+                                    name : name,
+                                    hex  : hex
+                                }
+                                oem_palette.push(oem_color);
+                                usedColorList.push(hex + '_' + name);                            
                             }
                         }
                     }
@@ -52,8 +59,9 @@ exports.process = function(filename){
                         doors: doors,
                         style: style,
                         vins : vins,
-                        colors : colorlist,                        
-                        colors_standard: standard_palette
+                        colors_oem : oem_palette,                        
+                        colors_standard: standard_palette,
+                        used_color_list : usedColorList
                     };
 
                     output.push(objToAdd);
@@ -69,10 +77,18 @@ exports.process = function(filename){
                             for (var j = 0; j < colors.length; j += 3) {
                                 var hex  = colors[j + 1],
                                     name = colors[j + 3];
+                                    
+                                if (hex != null) {
+                                    hex = hex.toUpperCase();
+                                    if (!output[n].used_color_list.includes(hex + '_' + name)) {
 
-                                if (!output[n].colors.includes(hex + '_' + name)) {
-                                    if (hex != null) {
-                                        output[n].colors.push(hex + '_' + name);
+                                        var oem_color = {
+                                            name : name,
+                                            hex  : hex
+                                        }
+                                        
+                                        output[n].colors_oem.push(oem_color);                                        
+                                        output[n].used_color_list.push(hex + '_' + name);
                                     }
                                 }
                             }
@@ -81,7 +97,14 @@ exports.process = function(filename){
                 }
             })
             .on('done', (error) => { 
-                fs.writeFile(json_save_path, beautify(output, null, 2, 35), function(err) {
+                //Just clean up the object by removing the used_color_list;
+        
+                for (var key in output ){
+                    var obj = output[key];
+                    delete obj.used_color_list;                    
+                }
+                
+                fs.writeFile(json_save_path, beautify(output, null, 2, 100), function(err) {
                     if(err) return console.log(err);                                            
                 });
                 
